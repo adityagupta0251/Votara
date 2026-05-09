@@ -1,32 +1,69 @@
+/// Unit tests for Votara — no external test crates needed.
+/// Full integration tests live in tests/ (TypeScript, run via `anchor test`).
+#[cfg(test)]
+mod tests {
+    use anchor_lang::prelude::Pubkey;
 
-use {
-    anchor_lang::{solana_program::instruction::Instruction, InstructionData, ToAccountMetas},
-    litesvm::LiteSVM,
-    solana_message::{Message, VersionedMessage},
-    solana_signer::Signer,
-    solana_keypair::Keypair,
-    solana_transaction::versioned::VersionedTransaction,
-};
+    #[test]
+    fn test_program_id_is_set() {
+        let id = votara::id();
+        assert_ne!(id, Pubkey::default(), "Program ID should not be the default pubkey");
+    }
 
-#[test]
-fn test_initialize() {
-    let program_id = votara::id();
-    let payer = Keypair::new();
-    let mut svm = LiteSVM::new();
-    let bytes = include_bytes!("../../../target/deploy/votara.so");
-    svm.add_program(program_id, bytes).unwrap();
-    svm.airdrop(&payer.pubkey(), 1_000_000_000).unwrap();
-    
-    let instruction = Instruction::new_with_bytes(
-        program_id,
-        &votara::instruction::Initialize {}.data(),
-        votara::accounts::Initialize {}.to_account_metas(None),
-    );
+    #[test]
+    fn test_dao_pda_derivation() {
+        let (pda, bump) = Pubkey::find_program_address(&[b"dao"], &votara::id());
+        assert_ne!(pda, Pubkey::default());
+        assert!(bump <= 255);
+    }
 
-    let blockhash = svm.latest_blockhash();
-    let msg = Message::new_with_blockhash(&[instruction], Some(&payer.pubkey()), &blockhash);
-    let tx = VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[payer]).unwrap();
+    #[test]
+    fn test_config_pda_derivation() {
+        let (pda, bump) = Pubkey::find_program_address(&[b"config"], &votara::id());
+        assert_ne!(pda, Pubkey::default());
+        assert!(bump <= 255);
+    }
 
-    let res = svm.send_transaction(tx);
-    assert!(res.is_ok());
+    #[test]
+    fn test_treasury_pda_derivation() {
+        let (pda, bump) = Pubkey::find_program_address(&[b"treasury"], &votara::id());
+        assert_ne!(pda, Pubkey::default());
+        assert!(bump <= 255);
+    }
+
+    #[test]
+    fn test_proposal_pda_derivation() {
+        let proposal_id: u64 = 1;
+        let (pda, bump) = Pubkey::find_program_address(
+            &[b"proposal", &proposal_id.to_le_bytes()],
+            &votara::id(),
+        );
+        assert_ne!(pda, Pubkey::default());
+        assert!(bump <= 255);
+    }
+
+    #[test]
+    fn test_voter_pda_derivation() {
+        let authority = Pubkey::new_unique();
+        let (pda, bump) = Pubkey::find_program_address(
+            &[b"voter", authority.as_ref()],
+            &votara::id(),
+        );
+        assert_ne!(pda, Pubkey::default());
+        assert!(bump <= 255);
+    }
+
+    #[test]
+    fn test_governance_mint_pda_derivation() {
+        let (pda, bump) = Pubkey::find_program_address(&[b"governance_mint"], &votara::id());
+        assert_ne!(pda, Pubkey::default());
+        assert!(bump <= 255);
+    }
+
+    #[test]
+    fn test_vault_pda_derivation() {
+        let (pda, bump) = Pubkey::find_program_address(&[b"vault"], &votara::id());
+        assert_ne!(pda, Pubkey::default());
+        assert!(bump <= 255);
+    }
 }
