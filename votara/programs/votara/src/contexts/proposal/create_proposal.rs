@@ -36,13 +36,11 @@ pub struct CreateProposal<'info> {
     pub treasury: Account<'info, Treasury>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = creator,
+        space = 8 + Voter::INIT_SPACE,
         seeds = [b"voter", creator.key().as_ref()],
-        bump = voter.bump,
-        constraint = !voter.is_banned
-            @ VotaraError::Unauthorized,
-        constraint = voter.tokens_staked >= dao.minimum_tokens_to_propose
-            @ VotaraError::InsufficientTokens
+        bump
     )]
     pub voter: Account<'info, Voter>,
 

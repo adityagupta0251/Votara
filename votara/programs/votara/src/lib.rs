@@ -154,6 +154,21 @@ pub mod votara {
         proposal.created_at = clock.unix_timestamp;
         proposal.bump = ctx.bumps.proposal;
 
+        if voter.authority == Pubkey::default() {
+            voter.authority = ctx.accounts.creator.key();
+            voter.registered_at = clock.unix_timestamp;
+            voter.bump = ctx.bumps.voter;
+        }
+
+        require!(
+            !voter.is_banned,
+            VotaraError::Unauthorized
+        );
+        require!(
+            voter.tokens_staked >= dao.minimum_tokens_to_propose,
+            VotaraError::InsufficientTokens
+        );
+
         analytics.proposal = proposal.key();
         analytics.live_yes_votes = 0;
         analytics.live_no_votes = 0;
@@ -595,10 +610,16 @@ pub mod votara {
         let treasury = &mut ctx.accounts.treasury;
         let clock = Clock::get()?;
 
-        require!(amount > 0, VotaraError::InsufficientTokens);
+
 
         // SPL token transfer happens via CPI (implementation placeholder)
         // anchor_spl::token::transfer(cpi_ctx, amount)?;
+
+        if voter.authority == Pubkey::default() {
+            voter.authority = ctx.accounts.voter_authority.key();
+            voter.registered_at = clock.unix_timestamp;
+            voter.bump = ctx.bumps.voter;
+        }
 
         voter.tokens_staked = voter.tokens_staked.checked_add(amount).ok_or(VotaraError::Overflow)?;
         voter.voting_power = voter.tokens_staked; // 1 token = 1 vote (linear)
@@ -647,6 +668,12 @@ pub mod votara {
         );
 
         // SOL transfer + SPL token transfer via CPI (implementation placeholder)
+
+        if voter.authority == Pubkey::default() {
+            voter.authority = ctx.accounts.buyer.key();
+            voter.registered_at = Clock::get()?.unix_timestamp;
+            voter.bump = ctx.bumps.voter;
+        }
 
         voter.tokens_staked = voter.tokens_staked.checked_add(amount).ok_or(VotaraError::Overflow)?;
         voter.voting_power = voter.tokens_staked;

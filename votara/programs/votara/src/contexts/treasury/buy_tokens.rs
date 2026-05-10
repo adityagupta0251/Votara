@@ -28,11 +28,11 @@ pub struct BuyTokens<'info> {
     pub treasury: Account<'info, Treasury>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = buyer,
+        space = 8 + Voter::INIT_SPACE,
         seeds = [b"voter", buyer.key().as_ref()],
-        bump = voter.bump,
-        constraint = !voter.is_banned
-            @ VotaraError::Unauthorized
+        bump
     )]
     pub voter: Account<'info, Voter>,
 

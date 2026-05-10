@@ -1,0 +1,17 @@
+{
+  "name": "Votara DAO",
+  "short_name": "Votara",
+  "description": "Next-generation decentralized voting platform built on Solana",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#08060d",
+  "theme_color": "#aa3bff",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

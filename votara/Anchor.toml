@@ -11,9 +11,9 @@ votara = "4s8kSwWN26t3DjKNNBgcypAvG7MedaMsdrHZGbBQy525"
 
 [provider]
 cluster = "devnet"
-wallet = "~/.config/solana/id.json"
+wallet = "fresh-devnet.json"
 
 [scripts]
-test = "cargo test"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 
 [hooks]

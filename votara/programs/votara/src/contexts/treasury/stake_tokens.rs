@@ -21,11 +21,11 @@ pub struct StakeTokens<'info> {
     pub dao: Account<'info, Dao>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = voter_authority,
+        space = 8 + Voter::INIT_SPACE,
         seeds = [b"voter", voter_authority.key().as_ref()],
-        bump = voter.bump,
-        constraint = !voter.is_banned
-            @ VotaraError::Unauthorized
+        bump
     )]
     pub voter: Account<'info, Voter>,
 
@@ -54,4 +54,5 @@ pub struct StakeTokens<'info> {
     pub vault: Account<'info, TokenAccount>,
 
     pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
 }
