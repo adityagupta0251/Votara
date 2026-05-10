@@ -9,17 +9,19 @@ interface ViteEnv {
 
 // --- Program Constants ---
 export const PROGRAM_ID = new PublicKey(
-    "4s8kSwWN26t3DjKNNBgcypAvG7MedaMsdrHZGbBQy525",
+    "8A1F7cmMYi5L8cC2Zs3Uzu8RH3MSQGRbSGCx8AsD8RxZ",
 );
 
 // --- Network & RPC Endpoints ---
 const env = import.meta.env as unknown as ViteEnv;
 
 export const RPC_ENDPOINT =
-    env.VITE_RPC_ENDPOINT ?? "https://api.devnet.solana.com";
+    env.VITE_RPC_ENDPOINT ?? 
+    (env.VITE_CLUSTER === "localnet" ? "http://127.0.0.1:8899" : "https://api.devnet.solana.com");
 
 export const WS_ENDPOINT =
-    env.VITE_WS_ENDPOINT ?? "wss://api.devnet.solana.com";
+    env.VITE_WS_ENDPOINT ?? 
+    (env.VITE_CLUSTER === "localnet" ? "ws://127.0.0.1:8900" : "wss://api.devnet.solana.com");
 
 /** Defines the required transaction commitment level. */
 export const COMMITMENT: Commitment = "confirmed";
@@ -49,7 +51,9 @@ export const LAMPORTS_PER_SOL = 1_000_000_000;
 export const EXPLORER_BASE =
     env.VITE_CLUSTER === "mainnet-beta"
         ? "https://explorer.solana.com"
-        : "https://explorer.solana.com?cluster=devnet";
+        : env.VITE_CLUSTER === "localnet" || !env.VITE_CLUSTER
+          ? "https://explorer.solana.com?cluster=custom&customUrl=http%3A%2F%2F127.0.0.1%3A8899"
+          : "https://explorer.solana.com?cluster=devnet";
 
 /**
  * Helper to generate tx links

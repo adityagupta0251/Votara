@@ -6,11 +6,11 @@ package_manager = "yarn"
 resolution = true
 skip-lint = false
 
-[programs.devnet]
-votara = "4s8kSwWN26t3DjKNNBgcypAvG7MedaMsdrHZGbBQy525"
+[programs.localnet]
+votara = "8A1F7cmMYi5L8cC2Zs3Uzu8RH3MSQGRbSGCx8AsD8RxZ"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "fresh-devnet.json"
 
 [scripts]

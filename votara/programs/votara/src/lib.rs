@@ -10,7 +10,7 @@ pub use errors::*;
 pub use events::*;
 pub use state::*;
 
-declare_id!("4s8kSwWN26t3DjKNNBgcypAvG7MedaMsdrHZGbBQy525");
+declare_id!("8A1F7cmMYi5L8cC2Zs3Uzu8RH3MSQGRbSGCx8AsD8RxZ");
 
 #[program]
 pub mod votara {
@@ -34,7 +34,7 @@ pub mod votara {
         dao.total_votes = 0;
         dao.governance_token_mint = Pubkey::default(); // set after InitializeTreasury
         dao.proposal_fee = 1_000_000; // 0.001 SOL in lamports
-        dao.minimum_tokens_to_propose = 100;
+        dao.minimum_tokens_to_propose = 0; // Set to 0 for easier local testing
         dao.quadratic_voting_enabled = false;
         dao.emergency_paused = false;
         dao.created_at = clock.unix_timestamp;

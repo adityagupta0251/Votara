@@ -36,39 +36,78 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const publicKey = wallet?.account.address ? new PublicKey(wallet.account.address) : null;
         const walletName = wallet?.account.label || "Unknown";
 
-        // Internal helper to get the injected provider for signing
-        // We still need this for Anchor (Web3.js v1) compatibility
+        // Internal helper to get the injected provider for signing as a fallback
         const getInjectedProvider = () => {
             const w = window as any;
-            if (walletName.toLowerCase().includes("phantom")) return w?.phantom?.solana;
-            if (walletName.toLowerCase().includes("backpack")) return w?.backpack;
-            if (walletName.toLowerCase().includes("solflare")) return w?.solflare;
+            const name = walletName.toLowerCase();
+            if (name.includes("phantom")) return w?.phantom?.solana;
+            if (name.includes("backpack")) return w?.backpack;
+            if (name.includes("solflare")) return w?.solflare;
             return w?.solana;
         };
+
+        const w = wallet as any;
 
         return {
             publicKey,
             connected,
             connecting,
             walletName,
-            connect: async () => {
-                // WalletButton handles the connector selection UI.
-            },
+            connect: async () => {},
             disconnect,
             signTransaction: async (tx: any) => {
+                // Try modern Wallet Standard first
+                if (w?.features?.["solana:signTransaction"]) {
+                    const { signTransaction } = w.features["solana:signTransaction"];
+                    const [signed] = await signTransaction([{ 
+                        transaction: tx.serialize({ requireAllSignatures: false }) 
+                    }]);
+                    return Transaction.from(signed.transaction) as any;
+                }
+                
+                // Fallback to legacy injected provider
                 const provider = getInjectedProvider();
-                if (!provider) throw new Error("Wallet provider not found");
-                return provider.signTransaction(tx);
+                if (provider?.signTransaction) {
+                    return provider.signTransaction(tx);
+                }
+
+                throw new Error("Wallet does not support signTransaction");
             },
             signAllTransactions: async (txs: any[]) => {
+                // Try modern Wallet Standard first
+                if (w?.features?.["solana:signTransaction"]) {
+                    const { signTransaction } = w.features["solana:signTransaction"];
+                    const inputs = txs.map(tx => ({ 
+                        transaction: tx.serialize({ requireAllSignatures: false }) 
+                    }));
+                    const signedOutputs = await signTransaction(inputs);
+                    return signedOutputs.map(output => Transaction.from(output.transaction) as any);
+                }
+
+                // Fallback to legacy injected provider
                 const provider = getInjectedProvider();
-                if (!provider) throw new Error("Wallet provider not found");
-                return provider.signAllTransactions(txs);
+                if (provider?.signAllTransactions) {
+                    return provider.signAllTransactions(txs);
+                }
+
+                throw new Error("Wallet does not support signTransaction");
             },
             signMessage: async (msg: Uint8Array) => {
+                // Try modern Wallet Standard first
+                if (w?.features?.["solana:signMessage"]) {
+                    const { signMessage } = w.features["solana:signMessage"];
+                    const [signed] = await signMessage([{ message: msg }]);
+                    return { signature: signed.signature };
+                }
+
+                // Fallback to legacy injected provider
                 const provider = getInjectedProvider();
-                if (!provider) throw new Error("Wallet provider not found");
-                return provider.signMessage(msg, "utf8");
+                if (provider?.signMessage) {
+                    const { signature } = await provider.signMessage(msg, "utf8");
+                    return { signature };
+                }
+
+                throw new Error("Wallet does not support signMessage");
             }
         };
     }, [status, disconnect, wallet]);

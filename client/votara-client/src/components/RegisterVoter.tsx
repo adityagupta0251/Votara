@@ -1,5 +1,10 @@
 import { BN } from "@coral-xyz/anchor";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { 
+    TOKEN_PROGRAM_ID, 
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    createAssociatedTokenAccountInstruction 
+} from "@solana/spl-token";
+import { Transaction, SystemProgram } from "@solana/web3.js";
 import { useProgram } from "../program";
 import { useWallet } from "../wallet";
 import { useTransaction } from "../hooks/useTransaction";
@@ -19,25 +24,49 @@ export function RegisterVoter() {
 
         const [daoPda] = pdaDao();
         const [voterPda] = pdaVoter(publicKey);
+        const [mintPda] = pdaGovMint();
 
         await execute(async () => {
-            // In this program version, a voter account is initialized when staking tokens.
-            // We use stakeTokens with 0 amount as an 'initialization' or 'registration' step.
-            // Note: This requires the user to have a token account (even with 0 balance).
-            return (program.methods as any)
+            const tx = new Transaction();
+            const connection = program.provider.connection;
+
+            // Check if the user token account exists
+            const accountInfo = await connection.getAccountInfo(userTokenAccount);
+            
+            if (!accountInfo) {
+                // If the ATA doesn't exist, add the instruction to create it
+                tx.add(
+                    createAssociatedTokenAccountInstruction(
+                        publicKey,
+                        userTokenAccount,
+                        publicKey,
+                        mintPda,
+                        TOKEN_PROGRAM_ID,
+                        ASSOCIATED_TOKEN_PROGRAM_ID
+                    )
+                );
+            }
+
+            // Add the stakeTokens(0) instruction which initializes the Voter PDA
+            const stakeIx = await (program.methods as any)
                 .stakeTokens(new BN(0))
                 .accounts({
                     voterAuthority: publicKey,
                     dao: daoPda,
                     voter: voterPda,
-                    // These are additional accounts required by stake_tokens
                     treasury: (await pdaTreasury())[0],
-                    governanceTokenMint: (await pdaGovMint())[0],
+                    governanceTokenMint: mintPda,
                     userTokenAccount: userTokenAccount,
                     vault: (await pdaVault())[0],
                     tokenProgram: TOKEN_PROGRAM_ID,
+                    systemProgram: SystemProgram.programId,
                 })
-                .rpc();
+                .instruction();
+            
+            tx.add(stakeIx);
+
+            // Send the transaction with both instructions
+            return (program.provider as any).sendAndConfirm(tx);
         });
 
         await refetch();
@@ -48,29 +77,26 @@ export function RegisterVoter() {
     const busy = txState.status === "pending" || txState.status === "confirming";
 
     return (
-        <div className="p-6 bg-[#aa3bff]/5 border border-[#aa3bff]/20 rounded-2xl animate-in zoom-in-95 duration-500">
+        <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl animate-in zoom-in-95 duration-500">
             <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 bg-[#aa3bff]/10 rounded-full flex items-center justify-center mb-4 text-2xl">
-                    🆔
+                <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-4 text-slate-400">
+                    <span className="text-xl font-black">🆔</span>
                 </div>
-                <h3 className="text-lg font-bold mb-2">Join the DAO</h3>
-                <p className="text-sm text-gray-400 mb-6 max-w-[200px]">
-                    You need to register your voter account before you can cast votes or create proposals.
+                <h3 className="text-sm font-black text-slate-100 uppercase tracking-widest mb-2">Institutional Onboarding</h3>
+                <p className="text-[10px] text-slate-500 mb-6 max-w-[200px] font-bold leading-relaxed">
+                    Initialize your voter profile to participate in quadratic governance and treasury allocations.
                 </p>
                 <button
                     onClick={handleRegister}
                     disabled={busy}
-                    className="btn-primary w-full"
+                    className="premium-btn btn-slate w-full py-3 text-[10px] font-black uppercase tracking-[0.2em]"
                 >
-                    {busy ? (
-                        <span className="flex items-center justify-center gap-2">
-                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            Registering…
-                        </span>
-                    ) : "Register Now"}
+                    {busy ? "Syncing..." : "Register Voter"}
                 </button>
                 {txState.error && (
-                    <p className="mt-3 text-xs text-red-400">⚠️ {txState.error}</p>
+                    <div className="mt-4 p-2 bg-red-500/5 border border-red-500/10 rounded-lg text-[9px] text-red-400 font-bold">
+                        {txState.error}
+                    </div>
                 )}
             </div>
         </div>

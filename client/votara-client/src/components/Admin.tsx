@@ -27,7 +27,6 @@ export function InitializeDao() {
         const [configPda] = pdaConfig();
 
         await execute(async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return (program.methods as any)
                 .initializeDao()
                 .accounts({
@@ -40,20 +39,24 @@ export function InitializeDao() {
         });
     };
 
-    const busy =
-        txState.status === "pending" || txState.status === "confirming";
+    const busy = txState.status === "pending" || txState.status === "confirming";
     return (
-        <div className="admin-action">
-            <h4>Initialize DAO</h4>
-            <button onClick={init} disabled={busy}>
-                {busy ? "Working…" : "Initialize DAO"}
+        <div className="space-y-4">
+            <button 
+                onClick={init} 
+                disabled={busy}
+                className="w-full premium-btn btn-slate py-4 font-black uppercase tracking-widest text-[10px]"
+            >
+                {busy ? "Broadcasting..." : "1. Initialize Protocol"}
             </button>
-            {txState.error && <p className="error">{txState.error}</p>}
+            {txState.error && (
+                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-[10px] text-red-400 font-bold">
+                    {txState.error}
+                </div>
+            )}
         </div>
     );
 }
-
-// ─── InitializeTreasury ───────────────────────────────────────────────────────
 
 export function InitializeTreasury() {
     const { program } = useProgram();
@@ -68,7 +71,6 @@ export function InitializeTreasury() {
         const [vaultPda] = pdaVault();
 
         await execute(async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return (program.methods as any)
                 .initializeTreasury()
                 .accounts({
@@ -85,15 +87,21 @@ export function InitializeTreasury() {
         });
     };
 
-    const busy =
-        txState.status === "pending" || txState.status === "confirming";
+    const busy = txState.status === "pending" || txState.status === "confirming";
     return (
-        <div className="admin-action">
-            <h4>Initialize Treasury</h4>
-            <button onClick={init} disabled={busy}>
-                {busy ? "Working…" : "Initialize Treasury"}
+        <div className="space-y-4">
+            <button 
+                onClick={init} 
+                disabled={busy}
+                className="w-full premium-btn btn-slate py-4 font-black uppercase tracking-widest text-[10px]"
+            >
+                {busy ? "Broadcasting..." : "2. Initialize Treasury"}
             </button>
-            {txState.error && <p className="error">{txState.error}</p>}
+            {txState.error && (
+                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-[10px] text-red-400 font-bold">
+                    {txState.error}
+                </div>
+            )}
         </div>
     );
 }

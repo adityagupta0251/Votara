@@ -28,6 +28,8 @@ import { useDao } from "./hooks/useDao";
 import { useTokenAccount } from "./hooks/useTokenAccount";
 import { SplashScreen } from "./components/SplashScreen";
 import { cn } from "./utils/cn";
+import { InitializeDao, InitializeTreasury } from "./components/Admin";
+import { BuyTokens } from "./components/BuyTokens";
 import type { ProposalWithPubkey } from "./types";
 
 type Tab = "dashboard" | "proposals" | "create" | "voting" | "treasury" | "profile" | "admin";
@@ -56,7 +58,7 @@ function AppContent() {
         { id: "profile", label: "Voter Profile", icon: User, group: "USER" },
     ];
 
-    if (isAdmin) {
+    if (isAdmin || !dao) {
         navigation.push({ id: "admin", label: "Protocol Admin", icon: Shield, group: "SYSTEM" });
     }
 
@@ -136,7 +138,10 @@ function AppContent() {
                             <h1 className="text-3xl font-bold mb-2 text-slate-100">Treasury Reserves</h1>
                             <p className="text-slate-500 text-sm">Monitor SOL and governance token allocations.</p>
                         </header>
-                        <TreasuryInfo />
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <TreasuryInfo />
+                            <BuyTokens buyerTokenAccount={userTokenAccount} />
+                        </div>
                     </div>
                 );
             case "profile":
@@ -153,8 +158,20 @@ function AppContent() {
                             <h1 className="text-3xl font-bold mb-2 text-slate-100">Protocol Settings</h1>
                             <p className="text-slate-500 text-sm">Authority-only administrative controls.</p>
                         </header>
-                        <div className="premium-card p-10 border-slate-800/50">
-                            <WithdrawTokens destinationTokenAccount={userTokenAccount} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {!dao && (
+                                <div className="premium-card p-10 border-slate-800/50 space-y-6">
+                                    <h3 className="text-sm font-black text-slate-100 uppercase tracking-widest">Bootstrap Network</h3>
+                                    <p className="text-xs text-slate-500">Initialize the core DAO and Treasury accounts on this cluster.</p>
+                                    <div className="space-y-4">
+                                        <InitializeDao />
+                                        <InitializeTreasury />
+                                    </div>
+                                </div>
+                            )}
+                            <div className="premium-card p-10 border-slate-800/50">
+                                <WithdrawTokens destinationTokenAccount={userTokenAccount} />
+                            </div>
                         </div>
                     </div>
                 );
@@ -261,7 +278,9 @@ function AppContent() {
                             <div className="flex items-center gap-3">
                                 <div className="text-right hidden sm:block">
                                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest leading-none mb-1">Network</p>
-                                    <p className="text-xs font-bold text-slate-300 leading-none">Devnet-Beta</p>
+                                    <p className="text-xs font-bold text-slate-300 leading-none">
+                                        {import.meta.env.VITE_CLUSTER === "localnet" || !import.meta.env.VITE_CLUSTER ? "Localhost" : "Devnet-Beta"}
+                                    </p>
                                 </div>
                                 <div className="w-2 h-2 rounded-full bg-slate-500 animate-pulse shadow-[0_0_10px_rgba(148,163,184,0.5)]" />
                             </div>
