@@ -97,7 +97,7 @@ export function Vote({
         onVoted?.();
     };
 
-    const busy = txState.status === "pending" || txState.status === "confirming";
+    const busy = txState.status === "sending" || txState.status === "confirming";
     const quadCost = Math.pow(Number(voteAmount), 2);
 
     return (
@@ -170,7 +170,9 @@ export function Vote({
             {txState.status === "success" && (
                 <div className="mt-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-xs text-green-400 text-center animate-in zoom-in-95">
                     ✓ Vote confirmed in sub-100ms. 
-                    <a href={txState.explorerUrl} target="_blank" rel="noreferrer" className="underline ml-2">Explorer</a>
+                    {txState.explorerUrl && (
+                        <a href={txState.explorerUrl} target="_blank" rel="noreferrer" className="underline ml-2">Explorer</a>
+                    )}
                 </div>
             )}
         </div>

@@ -1,38 +1,57 @@
-import { PublicKey, Connection } from "@solana/web3.js";
-import {
-    PROGRAM_ID,
-    SEED_DAO,
-    SEED_CONFIG,
-    SEED_TREASURY,
-    SEED_VOTER,
-    SEED_PROPOSAL,
-    SEED_ANALYTICS,
-    SEED_VOTE,
-    SEED_VAULT,
-    SEED_GOV_MINT,
-} from "../src/constants/constant";
+import { PublicKey } from "@solana/web3.js";
+import { PROGRAM_ID, SEED_DAO, SEED_CONFIG, SEED_TREASURY, SEED_GOV_MINT, SEED_VOTER, SEED_PROPOSAL, SEED_ANALYTICS, SEED_VOTE, SEED_VAULT } from "./constants/constant";
+import { Buffer } from "buffer";
+import { BN } from "@coral-xyz/anchor";
 
-function find(seeds: Buffer[]): [PublicKey, number] {
-    return PublicKey.findProgramAddressSync(seeds, PROGRAM_ID);
+export function pdaDao(): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync([Buffer.from(SEED_DAO)], PROGRAM_ID);
 }
 
-export const pdaDao = () => find([SEED_DAO]);
-export const pdaConfig = () => find([SEED_CONFIG]);
-export const pdaTreasury = () => find([SEED_TREASURY]);
-export const pdaVault = () => find([SEED_VAULT]);
-export const pdaGovMint = () => find([SEED_GOV_MINT]);
+export function pdaConfig(): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync([Buffer.from(SEED_CONFIG)], PROGRAM_ID);
+}
 
-export const pdaVoter = (authority: PublicKey) =>
-    find([SEED_VOTER, authority.toBuffer()]);
+export function pdaTreasury(): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync([Buffer.from(SEED_TREASURY)], PROGRAM_ID);
+}
 
-export const pdaProposal = (id: bigint) => {
-    const idBuf = Buffer.alloc(8);
-    idBuf.writeBigUInt64LE(id);
-    return find([SEED_PROPOSAL, idBuf]);
-};
+export function pdaGovMint(): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync([Buffer.from(SEED_GOV_MINT)], PROGRAM_ID);
+}
 
-export const pdaAnalytics = (proposal: PublicKey) =>
-    find([SEED_ANALYTICS, proposal.toBuffer()]);
+export function pdaVault(): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync([Buffer.from(SEED_VAULT)], PROGRAM_ID);
+}
 
-export const pdaVoteRecord = (proposal: PublicKey, voter: PublicKey) =>
-    find([SEED_VOTE, proposal.toBuffer(), voter.toBuffer()]);
+export function pdaVoter(authority: PublicKey): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync(
+        [Buffer.from(SEED_VOTER), authority.toBuffer()],
+        PROGRAM_ID,
+    );
+}
+
+export function pdaProposal(id: number | BN): [PublicKey, number] {
+    const idBN = typeof id === "number" ? new BN(id) : id;
+    const idBuffer = idBN.toArrayLike(Buffer, "le", 8);
+    return PublicKey.findProgramAddressSync(
+        [Buffer.from(SEED_PROPOSAL), idBuffer],
+        PROGRAM_ID,
+    );
+}
+
+export function pdaAnalytics(proposal: PublicKey): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync(
+        [Buffer.from(SEED_ANALYTICS), proposal.toBuffer()],
+        PROGRAM_ID,
+    );
+}
+
+export function pdaVoteRecord(
+    proposal: PublicKey,
+    voterPda: PublicKey,
+): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync(
+        [Buffer.from(SEED_VOTE), proposal.toBuffer(), voterPda.toBuffer()],
+        PROGRAM_ID,
+    );
+}

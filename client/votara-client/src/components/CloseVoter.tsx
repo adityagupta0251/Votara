@@ -27,7 +27,7 @@ export function CloseVoter() {
         });
     };
 
-    const busy = txState.status === "pending" || txState.status === "confirming";
+    const busy = txState.status === "sending" || txState.status === "confirming";
 
     return (
         <div className="glass-card p-6 border-red-500/20">

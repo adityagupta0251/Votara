@@ -39,7 +39,7 @@ export function InitializeDao() {
         });
     };
 
-    const busy = txState.status === "pending" || txState.status === "confirming";
+    const busy = txState.status === "sending" || txState.status === "confirming";
     return (
         <div className="space-y-4">
             <button 
@@ -87,7 +87,7 @@ export function InitializeTreasury() {
         });
     };
 
-    const busy = txState.status === "pending" || txState.status === "confirming";
+    const busy = txState.status === "sending" || txState.status === "confirming";
     return (
         <div className="space-y-4">
             <button 
@@ -146,7 +146,7 @@ export function FinalizeProposal({
     };
 
     const busy =
-        txState.status === "pending" || txState.status === "confirming";
+        txState.status === "sending" || txState.status === "confirming";
     return (
         <div className="admin-action">
             <button onClick={finalize} disabled={busy}>
@@ -192,7 +192,7 @@ export function CancelProposal({
     };
 
     const busy =
-        txState.status === "pending" || txState.status === "confirming";
+        txState.status === "sending" || txState.status === "confirming";
     return (
         <div className="admin-action">
             <button onClick={cancel} disabled={busy} className="danger">
@@ -229,7 +229,7 @@ export function EmergencyPause({ paused }: { paused: boolean }) {
     };
 
     const busy =
-        txState.status === "pending" || txState.status === "confirming";
+        txState.status === "sending" || txState.status === "confirming";
     return (
         <div className="admin-action">
             <button

@@ -74,7 +74,7 @@ export function RegisterVoter() {
 
     if (exists) return null;
 
-    const busy = txState.status === "pending" || txState.status === "confirming";
+    const busy = txState.status === "sending" || txState.status === "confirming";
 
     return (
         <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl animate-in zoom-in-95 duration-500">

@@ -1,15 +1,10 @@
-/**
- * Builds and memoizes a @coral-xyz/anchor Program<Votara> instance.
- * Re-creates only when the wallet public key or connection changes.
- */
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { type ReactNode, useMemo } from "react";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import idlJson from "./idl/votara.json";
 export type Votara = any;
 import { COMMITMENT } from "../src/constants/constant";
-import { useConnection } from "./connection";
-import { useWallet } from "./wallet";
-import type { Transaction, VersionedTransaction } from "@solana/web3.js";
+import { useConnection, useWallet } from "./wallet";
+import { createContext, useContext } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,36 +18,24 @@ const ProgramCtx = createContext<ProgramCtxValue>({
     provider: null,
 });
 
-// ─── Adapter shim: bridge our minimal wallet → Anchor's wallet interface ──────
-
-function makeAnchorWallet(wallet: {
-    publicKey: import("@solana/web3.js").PublicKey | null;
-    signTransaction: <T extends Transaction | VersionedTransaction>(
-        tx: T,
-    ) => Promise<T>;
-    signAllTransactions: <T extends Transaction | VersionedTransaction>(
-        txs: T[],
-    ) => Promise<T[]>;
-}) {
-    if (!wallet.publicKey) return null;
-    return {
-        publicKey: wallet.publicKey,
-        signTransaction: wallet.signTransaction,
-        signAllTransactions: wallet.signAllTransactions,
-    };
-}
-
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function ProgramProvider({ children }: { children: ReactNode }) {
-    const connection = useConnection();
-    const wallet = useWallet();
+    const { connection } = useConnection();
+    const { publicKey, signTransaction, signAllTransactions } = useWallet();
 
     const { program, provider } = useMemo(() => {
-        const anchorWallet = makeAnchorWallet(wallet);
-        if (!anchorWallet) return { program: null, provider: null };
+        if (!publicKey || !signTransaction || !signAllTransactions) {
+            return { program: null, provider: null };
+        }
 
-        const prov = new AnchorProvider(connection, anchorWallet, {
+        const anchorWallet = {
+            publicKey,
+            signTransaction,
+            signAllTransactions,
+        };
+
+        const prov = new AnchorProvider(connection, anchorWallet as any, {
             commitment: COMMITMENT,
             preflightCommitment: COMMITMENT,
             skipPreflight: false,
@@ -64,7 +47,7 @@ export function ProgramProvider({ children }: { children: ReactNode }) {
         );
 
         return { program: prog, provider: prov };
-    }, [connection, wallet.publicKey]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [connection, publicKey, signTransaction, signAllTransactions]);
 
     return (
         <ProgramCtx.Provider value={{ program, provider }}>
