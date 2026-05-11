@@ -48,7 +48,7 @@ export function StakeTokens({ userTokenAccount, onStaked }: Props) {
     };
 
     const busy =
-        txState.status === "pending" || txState.status === "confirming";
+        txState.status === "sending" || txState.status === "confirming";
 
     return (
         <div className="stake-tokens">

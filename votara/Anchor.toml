@@ -1,16 +1,16 @@
 [toolchain]
-anchor_version = "1.0.2"
+anchor_version = "0.31.1"
 package_manager = "yarn"
 
 [features]
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-votara = "8A1F7cmMYi5L8cC2Zs3Uzu8RH3MSQGRbSGCx8AsD8RxZ"
+[programs.devnet]
+votara = "CXJXjwHGo67zYveByRp2aydFgXHRcPTEQbRt8iNQEtvF"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "fresh-devnet.json"
 
 [scripts]

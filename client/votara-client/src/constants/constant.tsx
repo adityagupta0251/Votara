@@ -9,7 +9,7 @@ interface ViteEnv {
 
 // --- Program Constants ---
 export const PROGRAM_ID = new PublicKey(
-    "8A1F7cmMYi5L8cC2Zs3Uzu8RH3MSQGRbSGCx8AsD8RxZ",
+    "CXJXjwHGo67zYveByRp2aydFgXHRcPTEQbRt8iNQEtvF",
 );
 
 // --- Network & RPC Endpoints ---
@@ -46,7 +46,9 @@ export const SEED_VAULT = encoder.encode("vault");
 // --- Token Constants ---
 export const TOKEN_DECIMALS = 6;
 export const LAMPORTS_PER_SOL = 1_000_000_000;
-
+export const TREASURY_PDA = new PublicKey(
+  "DmtNTWpZFsQChh1noKZZu2XZt4hTEu1wTxPE2256bq4k"
+);
 // --- UI / Explorer Constants ---
 /**
  * Generates the correct Explorer URL base based on the environment.

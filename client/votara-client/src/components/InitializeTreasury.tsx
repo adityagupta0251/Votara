@@ -35,7 +35,7 @@ export function InitializeTreasury() {
     };
 
     const busy =
-        txState.status === "pending" || txState.status === "confirming";
+        txState.status === "sending" || txState.status === "confirming";
     return (
         <div className="admin-action">
             <h3>Initialize DAO Treasury</h3>

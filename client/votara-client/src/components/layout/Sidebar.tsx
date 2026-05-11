@@ -5,31 +5,27 @@ import {
     Shield
 } from "lucide-react";
 import { cn } from "../../utils/cn";
-import { NAVIGATION_ITEMS, type Tab, type NavItem } from "../../constants/navigation";
+import { NAVIGATION_ITEMS, type NavItem } from "../../constants/navigation";
+import { NavLink, useLocation } from "react-router-dom";
 
 interface SidebarProps {
-    activeTab: Tab;
-    setActiveTab: (tab: Tab) => void;
     isSidebarCollapsed: boolean;
     setIsSidebarCollapsed: (collapsed: boolean) => void;
-    setSelectedProposal: (proposal: any) => void;
     isAdmin: boolean;
     hasDao: boolean;
 }
 
 export function Sidebar({
-    activeTab,
-    setActiveTab,
     isSidebarCollapsed,
     setIsSidebarCollapsed,
-    setSelectedProposal,
     isAdmin,
     hasDao
 }: SidebarProps) {
+    const location = useLocation();
     const navigation: NavItem[] = [...NAVIGATION_ITEMS];
 
     if (isAdmin || !hasDao) {
-        navigation.push({ id: "admin", label: "Protocol Admin", icon: Shield, group: "SYSTEM" });
+        navigation.push({ id: "admin" as any, label: "Protocol Admin", path: "/admin", icon: Shield, group: "SYSTEM" });
     }
 
     return (
@@ -38,7 +34,7 @@ export function Sidebar({
             isSidebarCollapsed ? "w-20" : "w-72"
         )}>
             <div className="p-6 h-24 flex items-center border-b border-white/[0.03]">
-                <div className="flex items-center gap-4">
+                <NavLink to="/" className="flex items-center gap-4">
                     <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-slate-100 rounded-xl text-black font-black text-xl shadow-2xl shadow-white/5">
                         ◆
                     </div>
@@ -51,7 +47,7 @@ export function Sidebar({
                             VOTARA
                         </motion.span>
                     )}
-                </div>
+                </NavLink>
             </div>
 
             <div className="flex-1 py-8 overflow-y-auto scrollbar-premium px-4">
@@ -67,27 +63,30 @@ export function Sidebar({
                                         {group}
                                     </p>
                                 )}
-                                {items.map((item) => (
-                                    <button
-                                        key={item.id}
-                                        onClick={() => { setActiveTab(item.id as Tab); setSelectedProposal(null); }}
-                                        className={cn(
-                                            "w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 relative group",
-                                            activeTab === item.id ? "text-white bg-white/[0.03]" : "text-slate-500 hover:text-slate-200 hover:bg-white/[0.01]"
-                                        )}
-                                    >
-                                        <item.icon className={cn("w-5 h-5 shrink-0 transition-transform duration-500", activeTab === item.id ? "scale-110" : "group-hover:scale-110")} />
-                                        {!isSidebarCollapsed && (
-                                            <span className="text-xs font-bold tracking-tight">{item.label}</span>
-                                        )}
-                                        {activeTab === item.id && (
-                                            <motion.div
-                                                layoutId="active-pill"
-                                                className="absolute left-0 w-1 h-6 bg-slate-100 rounded-r-full"
-                                            />
-                                        )}
-                                    </button>
-                                ))}
+                                {items.map((item) => {
+                                    const isActive = location.pathname === item.path;
+                                    return (
+                                        <NavLink
+                                            key={item.id}
+                                            to={item.path}
+                                            className={({ isActive: linkActive }) => cn(
+                                                "w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 relative group",
+                                                linkActive ? "text-white bg-white/[0.03]" : "text-slate-500 hover:text-slate-200 hover:bg-white/[0.01]"
+                                            )}
+                                        >
+                                            <item.icon className={cn("w-5 h-5 shrink-0 transition-transform duration-500", isActive ? "scale-110" : "group-hover:scale-110")} />
+                                            {!isSidebarCollapsed && (
+                                                <span className="text-xs font-bold tracking-tight">{item.label}</span>
+                                            )}
+                                            {isActive && (
+                                                <motion.div
+                                                    layoutId="active-pill"
+                                                    className="absolute left-0 w-1 h-6 bg-slate-100 rounded-r-full"
+                                                />
+                                            )}
+                                        </NavLink>
+                                    );
+                                })}
                             </div>
                         );
                     })}

@@ -37,7 +37,7 @@ export function PickWinner({ proposalPda }: Props) {
         });
     };
 
-    const busy = txState.status === "pending" || txState.status === "confirming";
+    const busy = txState.status === "sending" || txState.status === "confirming";
 
     return (
         <div className="glass-card p-4">

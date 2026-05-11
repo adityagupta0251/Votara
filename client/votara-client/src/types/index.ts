@@ -1,30 +1,5 @@
-import { PublicKey } from "@solana/web3.js";
-import type BN from "bn.js";
-
-// ─── Enums ───────────────────────────────────────────────────────────────────
-
-export type VoteType =
-    | { yes: Record<string, never> }
-    | { no: Record<string, never> }
-    | { abstain: Record<string, never> };
-
-export type ProposalStatus =
-    | { draft: Record<string, never> }
-    | { active: Record<string, never> }
-    | { passed: Record<string, never> }
-    | { rejected: Record<string, never> }
-    | { executed: Record<string, never> }
-    | { cancelled: Record<string, never> }
-    | { expired: Record<string, never> };
-
-export type ProposalType =
-    | { general: Record<string, never> }
-    | { treasury: Record<string, never> }
-    | { governance: Record<string, never> }
-    | { upgrade: Record<string, never> }
-    | { emergency: Record<string, never> };
-
-// ─── On-chain account shapes ─────────────────────────────────────────────────
+import { BN } from "@coral-xyz/anchor";
+import type { PublicKey } from "@solana/web3.js";
 
 export interface DaoAccount {
     authority: PublicKey;
@@ -131,8 +106,6 @@ export interface AnalyticsAccount {
     bump: number;
 }
 
-// ─── UI / helper types ───────────────────────────────────────────────────────
-
 export interface ProposalWithPubkey {
     pubkey: PublicKey;
     account: ProposalAccount;
@@ -143,7 +116,27 @@ export interface VoterWithPubkey {
     account: VoterAccount;
 }
 
-// Resolved label helpers
+export type VoteType =
+    | { yes: Record<string, never> }
+    | { no: Record<string, never> }
+    | { abstain: Record<string, never> };
+
+export type ProposalStatus =
+    | { draft: Record<string, never> }
+    | { active: Record<string, never> }
+    | { passed: Record<string, never> }
+    | { rejected: Record<string, never> }
+    | { executed: Record<string, never> }
+    | { cancelled: Record<string, never> }
+    | { expired: Record<string, never> };
+
+export type ProposalType =
+    | { general: Record<string, never> }
+    | { treasury: Record<string, never> }
+    | { governance: Record<string, never> }
+    | { upgrade: Record<string, never> }
+    | { emergency: Record<string, never> };
+
 export type ProposalStatusLabel =
     | "Draft"
     | "Active"
@@ -152,12 +145,14 @@ export type ProposalStatusLabel =
     | "Executed"
     | "Cancelled"
     | "Expired";
+
 export type ProposalTypeLabel =
     | "General"
     | "Treasury"
     | "Governance"
     | "Upgrade"
     | "Emergency";
+
 export type VoteTypeLabel = "Yes" | "No" | "Abstain";
 
 export function resolveProposalStatus(s: ProposalStatus): ProposalStatusLabel {
