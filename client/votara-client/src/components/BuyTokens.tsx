@@ -88,8 +88,13 @@ export function BuyTokens({ buyerTokenAccount }: { buyerTokenAccount: PublicKey 
             </div>
 
             {txState.error && (
-                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-[10px] text-red-400 font-bold">
-                    {txState.error}
+                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-[10px] text-red-400 font-bold space-y-2">
+                    <p>{txState.error}</p>
+                    {txState.explorerUrl && (
+                        <a href={txState.explorerUrl} target="_blank" rel="noreferrer" className="block underline text-[9px] opacity-70 hover:opacity-100">
+                            View on Solana Explorer
+                        </a>
+                    )}
                 </div>
             )}
         </div>

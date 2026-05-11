@@ -22,9 +22,11 @@ export const RPC_ENDPOINT =
     env.VITE_RPC_ENDPOINT ?? 
     (CLUSTER === "localnet" ? "http://127.0.0.1:8899" : "https://api.devnet.solana.com");
 
+// Devnet WebSockets are notoriously flaky.
+// We default to null if not provided, allowing the SDK to use the RPC endpoint as a fallback for polling if needed.
 export const WS_ENDPOINT =
-    env.VITE_WS_ENDPOINT ?? 
-    (CLUSTER === "localnet" ? "ws://127.0.0.1:8900" : "wss://api.devnet.solana.com");
+    env.VITE_WS_ENDPOINT ||
+    (CLUSTER === "localnet" ? "ws://127.0.0.1:8900" : undefined);
 
 /** Defines the required transaction commitment level. */
 export const COMMITMENT: Commitment = "confirmed";

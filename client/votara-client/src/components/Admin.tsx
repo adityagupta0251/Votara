@@ -4,6 +4,8 @@ import { SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import { useProgram } from "../program";
 import { useWallet } from "../wallet";
 import { useTransaction } from "../hooks/useTransaction";
+import { useDao } from "../hooks/useDao";
+import { useTreasury } from "../hooks/useTreasury";
 import {
     pdaDao,
     pdaConfig,
@@ -20,6 +22,7 @@ export function InitializeDao() {
     const { program } = useProgram();
     const { publicKey } = useWallet();
     const { execute, txState } = useTransaction();
+    const { dao, refetch } = useDao();
 
     const init = async () => {
         if (!program || !publicKey) return;
@@ -48,18 +51,28 @@ export function InitializeDao() {
     };
 
     const busy = txState.status === "sending" || txState.status === "confirming";
+    const exists = !!dao;
+
     return (
         <div className="space-y-4">
             <button 
-                onClick={init} 
-                disabled={busy}
+                onClick={async () => {
+                    await init();
+                    await refetch();
+                }}
+                disabled={busy || exists}
                 className="w-full premium-btn btn-slate py-4 font-black uppercase tracking-widest text-[10px]"
             >
-                {busy ? "Broadcasting..." : "1. Initialize Protocol"}
+                {busy ? "Broadcasting..." : exists ? "✓ Protocol Initialized" : "1. Initialize Protocol"}
             </button>
             {txState.error && (
-                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-[10px] text-red-400 font-bold">
-                    {txState.error}
+                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-[10px] text-red-400 font-bold space-y-2">
+                    <p>{txState.error}</p>
+                    {txState.explorerUrl && (
+                        <a href={txState.explorerUrl} target="_blank" rel="noreferrer" className="block underline text-[9px] opacity-70 hover:opacity-100">
+                            View on Solana Explorer
+                        </a>
+                    )}
                 </div>
             )}
         </div>
@@ -70,6 +83,7 @@ export function InitializeTreasury() {
     const { program } = useProgram();
     const { publicKey } = useWallet();
     const { execute, txState } = useTransaction();
+    const { treasury, refetch } = useTreasury();
 
     const init = async () => {
         if (!program || !publicKey) return;
@@ -104,18 +118,28 @@ export function InitializeTreasury() {
     };
 
     const busy = txState.status === "sending" || txState.status === "confirming";
+    const exists = !!treasury;
+
     return (
         <div className="space-y-4">
             <button 
-                onClick={init} 
-                disabled={busy}
+                onClick={async () => {
+                    await init();
+                    await refetch();
+                }}
+                disabled={busy || exists}
                 className="w-full premium-btn btn-slate py-4 font-black uppercase tracking-widest text-[10px]"
             >
-                {busy ? "Broadcasting..." : "2. Initialize Treasury"}
+                {busy ? "Broadcasting..." : exists ? "✓ Treasury Initialized" : "2. Initialize Treasury"}
             </button>
             {txState.error && (
-                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-[10px] text-red-400 font-bold">
-                    {txState.error}
+                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-[10px] text-red-400 font-bold space-y-2">
+                    <p>{txState.error}</p>
+                    {txState.explorerUrl && (
+                        <a href={txState.explorerUrl} target="_blank" rel="noreferrer" className="block underline text-[9px] opacity-70 hover:opacity-100">
+                            View on Solana Explorer
+                        </a>
+                    )}
                 </div>
             )}
         </div>

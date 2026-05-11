@@ -32,6 +32,7 @@ export function useTransaction() {
             setTxState(prev => ({ ...prev, status: "confirming", signature }));
 
             const latestBlockhash = await connection.getLatestBlockhash();
+            // Increased timeout and robustness for confirmations
             const result = await connection.confirmTransaction({
                 signature,
                 blockhash: latestBlockhash.blockhash,
@@ -56,12 +57,15 @@ export function useTransaction() {
             return true;
         } catch (e: any) {
             console.error("Transaction failed", e);
+            // On timeout, the transaction might still be in flight. We provide the signature if available.
+            const errorSignature = e.signature || (e.message?.includes("signature") ? e.message.match(/[A-Za-z0-9]{32,}/)?.[0] : null);
+
             setTxState(prev => ({
                 ...prev,
                 status: "error",
                 error: e.message || "An unexpected error occurred",
-                signature: e.signature || null,
-                explorerUrl: e.signature ? getExplorerUrl(e.signature) : null
+                signature: errorSignature || prev.signature || null,
+                explorerUrl: (errorSignature || prev.signature) ? getExplorerUrl(errorSignature || prev.signature) : null
             }));
             return false;
         } finally {

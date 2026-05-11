@@ -170,8 +170,13 @@ export function Vote({
             </div>
 
             {txState.error && (
-                <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 text-center">
-                    {txState.error}
+                <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 text-center space-y-2">
+                    <p>{txState.error}</p>
+                    {txState.explorerUrl && (
+                        <a href={txState.explorerUrl} target="_blank" rel="noreferrer" className="block underline opacity-70 hover:opacity-100">
+                            View on Solana Explorer
+                        </a>
+                    )}
                 </div>
             )}
             
