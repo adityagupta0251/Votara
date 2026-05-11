@@ -54,19 +54,27 @@ export function Vote({
                 systemProgram: SystemProgram.programId,
             };
 
-            if (quadratic) {
-                return (program.methods as any)
-                    .castQuadraticVote(
-                        toAnchorVoteType(selected),
-                        new BN(voteAmount),
-                    )
+            try {
+                if (quadratic) {
+                    return await (program.methods as any)
+                        .castQuadraticVote(
+                            toAnchorVoteType(selected),
+                            new BN(voteAmount),
+                        )
+                        .accounts(baseAccounts)
+                        .rpc();
+                }
+                return await (program.methods as any)
+                    .castVote(toAnchorVoteType(selected))
                     .accounts(baseAccounts)
                     .rpc();
+            } catch (err: any) {
+                const logStr = JSON.stringify(err);
+                if (logStr.includes("already in use") || logStr.includes("0x0")) {
+                    throw new Error("You have already cast a vote for this proposal. Please retract your existing vote first if you wish to change it.");
+                }
+                throw err;
             }
-            return (program.methods as any)
-                .castVote(toAnchorVoteType(selected))
-                .accounts(baseAccounts)
-                .rpc();
         });
 
         onVoted?.();

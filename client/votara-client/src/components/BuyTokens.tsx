@@ -37,20 +37,28 @@ export function BuyTokens({ buyerTokenAccount }: { buyerTokenAccount: PublicKey 
         const [voterPda] = pdaVoter(publicKey);
 
         await execute(async () => {
-            return (program.methods as any)
-                .buyTokens(new BN(amount))
-                .accounts({
-                    buyer: publicKey,
-                    dao: daoPda,
-                    treasury: treasuryPda,
-                    voter: voterPda,
-                    governanceTokenMint: mintPda,
-                    vault: vaultPda,
-                    buyerTokenAccount: buyerTokenAccount,
-                    tokenProgram: TOKEN_PROGRAM_ID,
-                    systemProgram: SystemProgram.programId,
-                })
-                .rpc();
+            try {
+                return await (program.methods as any)
+                    .buyTokens(new BN(amount))
+                    .accounts({
+                        buyer: publicKey,
+                        dao: daoPda,
+                        treasury: treasuryPda,
+                        voter: voterPda,
+                        governanceTokenMint: mintPda,
+                        vault: vaultPda,
+                        buyerTokenAccount: buyerTokenAccount,
+                        tokenProgram: TOKEN_PROGRAM_ID,
+                        systemProgram: SystemProgram.programId,
+                    })
+                    .rpc();
+            } catch (err: any) {
+                const logStr = JSON.stringify(err);
+                if (logStr.includes("InsufficientFunds") || logStr.includes("6012")) {
+                    throw new Error("DAO Treasury does not have enough governance tokens to fulfill this purchase.");
+                }
+                throw err;
+            }
         });
     };
 
