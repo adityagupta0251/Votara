@@ -10,7 +10,7 @@ import { useProgram } from "../program";
 import { useWallet } from "../wallet";
 import { useTransaction } from "../hooks/useTransaction";
 import { useVoter } from "../hooks/useVoter";
-import { pdaDao, pdaVoter, pdaTreasury, pdaVault } from "../pda";
+import { pdaDao, pdaVoter, pdaTreasury, pdaVault, pdaGovMint } from "../pda";
 
 export function RegisterVoter() {
     const { program } = useProgram();
@@ -30,17 +30,8 @@ export function RegisterVoter() {
             const tx = new Transaction();
             const connection = program.provider.connection;
 
-            // 1. Fetch the treasury – this will fail if treasury not initialized
-            let treasury;
-            try {
-                treasury = await (program.account as any).treasury.fetch(treasuryPda);
-            } catch (err) {
-                console.error("Treasury fetch error:", err);
-                throw new Error(
-                    "DAO Treasury is not yet initialized. Please contact an administrator."
-                );
-            }
-            const realMint = treasury.governanceTokenMint;
+            // 1. Use the derived Governance Mint PDA
+            const [realMint] = pdaGovMint();
 
             // 2. Derive the correct associated token address for this user and real mint
             const ata = await getAssociatedTokenAddress(

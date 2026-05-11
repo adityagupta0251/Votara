@@ -18,8 +18,10 @@ export function useDao() {
             const [daoPda] = pdaDao();
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const acc = await (program.account as any).dao.fetchNullable(daoPda);
+            console.log("[useDao] Manual fetch result:", acc ? "Account found" : "Account null");
             setDao(acc as DaoAccount | null);
         } catch (e) {
+            console.error("[useDao] Manual fetch error:", e);
             setError((e as Error).message ?? "Failed to fetch DAO");
         } finally {
             setLoading(false);
@@ -47,8 +49,10 @@ export function useDao() {
                 const [daoPda] = pdaDao();
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const acc = await (program.account as any).dao.fetchNullable(daoPda);
+                console.log("[useDao] Auto fetch result:", acc ? "Account found" : "Account null");
                 if (isMounted) setDao(acc as DaoAccount | null);
             } catch (e) {
+                console.error("[useDao] Auto fetch error:", e);
                 if (isMounted)
                     setError((e as Error).message ?? "Failed to fetch DAO");
             } finally {

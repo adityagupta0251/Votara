@@ -27,15 +27,23 @@ export function InitializeDao() {
         const [configPda] = pdaConfig();
 
         await execute(async () => {
-            return (program.methods as any)
-                .initializeDao()
-                .accounts({
-                    authority: publicKey,
-                    dao: daoPda,
-                    config: configPda,
-                    systemProgram: SystemProgram.programId,
-                })
-                .rpc();
+            try {
+                return await (program.methods as any)
+                    .initializeDao()
+                    .accounts({
+                        authority: publicKey,
+                        dao: daoPda,
+                        config: configPda,
+                        systemProgram: SystemProgram.programId,
+                    })
+                    .rpc();
+            } catch (err: any) {
+                const logStr = JSON.stringify(err);
+                if (logStr.includes("already in use") || logStr.includes("0x0")) {
+                     throw new Error("Protocol is already initialized on this network.");
+                }
+                throw err;
+            }
         });
     };
 
