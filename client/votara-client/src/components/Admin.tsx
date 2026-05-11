@@ -79,19 +79,27 @@ export function InitializeTreasury() {
         const [vaultPda] = pdaVault();
 
         await execute(async () => {
-            return (program.methods as any)
-                .initializeTreasury()
-                .accounts({
-                    authority: publicKey,
-                    dao: daoPda,
-                    treasury: treasuryPda,
-                    governanceTokenMint: mintPda,
-                    vault: vaultPda,
-                    tokenProgram: TOKEN_PROGRAM_ID,
-                    systemProgram: SystemProgram.programId,
-                    rent: SYSVAR_RENT_PUBKEY,
-                })
-                .rpc();
+            try {
+                return await (program.methods as any)
+                    .initializeTreasury()
+                    .accounts({
+                        authority: publicKey,
+                        dao: daoPda,
+                        treasury: treasuryPda,
+                        governanceTokenMint: mintPda,
+                        vault: vaultPda,
+                        tokenProgram: TOKEN_PROGRAM_ID,
+                        systemProgram: SystemProgram.programId,
+                        rent: SYSVAR_RENT_PUBKEY,
+                    })
+                    .rpc();
+            } catch (err: any) {
+                const logStr = JSON.stringify(err);
+                if (logStr.includes("already in use") || logStr.includes("0x0")) {
+                     throw new Error("Treasury is already initialized on this network.");
+                }
+                throw err;
+            }
         });
     };
 

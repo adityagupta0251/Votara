@@ -24,6 +24,10 @@ export function pdaVault(): [PublicKey, number] {
 }
 
 export function pdaVoter(authority: PublicKey): [PublicKey, number] {
+    if (!authority || typeof authority.toBuffer !== 'function') {
+        console.error("[pdaVoter] Invalid authority:", authority);
+        throw new Error("pdaVoter: authority is invalid or undefined");
+    }
     return PublicKey.findProgramAddressSync(
         [Buffer.from(SEED_VOTER), authority.toBuffer()],
         PROGRAM_ID,
@@ -40,6 +44,10 @@ export function pdaProposal(id: number | BN): [PublicKey, number] {
 }
 
 export function pdaAnalytics(proposal: PublicKey): [PublicKey, number] {
+    if (!proposal || typeof proposal.toBuffer !== 'function') {
+        console.error("[pdaAnalytics] Invalid proposal:", proposal);
+        throw new Error("pdaAnalytics: proposal is invalid or undefined");
+    }
     return PublicKey.findProgramAddressSync(
         [Buffer.from(SEED_ANALYTICS), proposal.toBuffer()],
         PROGRAM_ID,
@@ -50,6 +58,10 @@ export function pdaVoteRecord(
     proposal: PublicKey,
     voterPda: PublicKey,
 ): [PublicKey, number] {
+    if (!proposal || typeof proposal.toBuffer !== 'function' || !voterPda || typeof voterPda.toBuffer !== 'function') {
+        console.error("[pdaVoteRecord] Invalid params:", { proposal, voterPda });
+        throw new Error("pdaVoteRecord: proposal or voterPda is invalid or undefined");
+    }
     return PublicKey.findProgramAddressSync(
         [Buffer.from(SEED_VOTE), proposal.toBuffer(), voterPda.toBuffer()],
         PROGRAM_ID,
