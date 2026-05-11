@@ -2,6 +2,7 @@ import { useDao } from "../hooks/useDao";
 import { Users, FileText, Zap, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "../utils/cn";
+import { PremiumCard, StatItem } from "./layout/Common";
 
 export function DaoStats() {
     const { dao, loading, error } = useDao();
@@ -15,9 +16,9 @@ export function DaoStats() {
     );
 
     if (error) return (
-        <div className="premium-card p-6 border-red-900/20 text-red-400 text-xs font-bold">
+        <PremiumCard className="p-6 border-red-900/20 text-red-400 text-xs font-bold">
             {error}
-        </div>
+        </PremiumCard>
     );
 
     if (!dao) return null;
@@ -58,42 +59,14 @@ export function DaoStats() {
             {/* Primary Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((s, i) => (
-                    <motion.div 
-                        key={s.label}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="premium-card p-6 relative group overflow-hidden"
-                    >
-                        <div className="flex items-center justify-between mb-4 relative z-10">
-                            <div className="p-2 bg-slate-950/50 rounded-lg text-slate-400 group-hover:text-slate-100 transition-colors border border-slate-800">
-                                <s.icon className="w-4 h-4" />
-                            </div>
-                            <span className="text-[10px] font-black text-slate-500 tracking-widest">{s.trend}</span>
-                        </div>
-                        <div className="relative z-10">
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">{s.label}</p>
-                            <p className="text-2xl font-bold text-white tracking-tighter">{s.value}</p>
-                        </div>
-                        
-                        {/* Simulated Micro-Chart */}
-                        <div className="absolute bottom-0 left-0 right-0 h-1 flex items-end px-6 gap-0.5 opacity-20">
-                            {[...Array(20)].map((_, j) => (
-                                <div 
-                                    key={j} 
-                                    className={cn("flex-1 rounded-t-sm", s.chartColor)}
-                                    style={{ height: `${20 + Math.random() * 80}%` }}
-                                />
-                            ))}
-                        </div>
-                    </motion.div>
+                    <StatItem key={s.label} {...s} delay={i * 0.1} />
                 ))}
             </div>
 
             {/* Advanced Analytics Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Governance Activity Timeline */}
-                <div className="lg:col-span-8 premium-card p-8">
+                <PremiumCard className="lg:col-span-8 p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <h3 className="text-sm font-black text-slate-100 uppercase tracking-widest mb-1">Proposal Success Ratio</h3>
@@ -118,10 +91,10 @@ export function DaoStats() {
                             </div>
                         ))}
                     </div>
-                </div>
+                </PremiumCard>
 
                 {/* Treasury Distribution */}
-                <div className="lg:col-span-4 premium-card p-8 flex flex-col">
+                <PremiumCard className="lg:col-span-4 p-8 flex flex-col">
                     <h3 className="text-sm font-black text-slate-100 uppercase tracking-widest mb-6">Treasury Flow</h3>
                     <div className="flex-1 flex items-center justify-center py-4">
                         <div className="relative w-32 h-32">
@@ -141,7 +114,7 @@ export function DaoStats() {
                         <DistributionItem label="Operations" value="25%" color="bg-slate-600" />
                         <DistributionItem label="Security" value="10%" color="bg-slate-800" />
                     </div>
-                </div>
+                </PremiumCard>
             </div>
         </div>
     );

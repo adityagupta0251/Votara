@@ -15,13 +15,16 @@ export const PROGRAM_ID = new PublicKey(
 // --- Network & RPC Endpoints ---
 const env = import.meta.env as unknown as ViteEnv;
 
+// Default to devnet for this branch
+export const CLUSTER = env.VITE_CLUSTER ?? "devnet";
+
 export const RPC_ENDPOINT =
     env.VITE_RPC_ENDPOINT ?? 
-    (env.VITE_CLUSTER === "localnet" ? "http://127.0.0.1:8899" : "https://api.devnet.solana.com");
+    (CLUSTER === "localnet" ? "http://127.0.0.1:8899" : "https://api.devnet.solana.com");
 
 export const WS_ENDPOINT =
     env.VITE_WS_ENDPOINT ?? 
-    (env.VITE_CLUSTER === "localnet" ? "ws://127.0.0.1:8900" : "wss://api.devnet.solana.com");
+    (CLUSTER === "localnet" ? "ws://127.0.0.1:8900" : "wss://api.devnet.solana.com");
 
 /** Defines the required transaction commitment level. */
 export const COMMITMENT: Commitment = "confirmed";
@@ -49,9 +52,9 @@ export const LAMPORTS_PER_SOL = 1_000_000_000;
  * Generates the correct Explorer URL base based on the environment.
  */
 export const EXPLORER_BASE =
-    env.VITE_CLUSTER === "mainnet-beta"
+    CLUSTER === "mainnet-beta"
         ? "https://explorer.solana.com"
-        : env.VITE_CLUSTER === "localnet" || !env.VITE_CLUSTER
+        : CLUSTER === "localnet"
           ? "https://explorer.solana.com?cluster=custom&customUrl=http%3A%2F%2F127.0.0.1%3A8899"
           : "https://explorer.solana.com?cluster=devnet";
 
