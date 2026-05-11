@@ -13,6 +13,8 @@ Votara is a governance-as-a-service layer for Solana communities. It solves the 
 
 ## 🛠 Tech Stack
 
+Link to access Program IDL 
+https://explorer.solana.com/address/CXJXjwHGo67zYveByRp2aydFgXHRcPTEQbRt8iNQEtvF/idl?cluster=devnet
 ### Backend (Smart Contracts)
 - **Rust & Anchor Framework:** For secure and efficient Solana programs.
 - **Solana Web3.js:** For off-chain interaction with the blockchain.
