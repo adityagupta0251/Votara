@@ -122,7 +122,7 @@ function ProfileView() {
     );
 }
 
-function AdminView({ dao, userTokenAccount }: { dao: any, userTokenAccount: any }) {
+function AdminView({ userTokenAccount }: { userTokenAccount: any }) {
     return (
         <div className="max-w-4xl space-y-10">
             <SEO title="Protocol Administration" />
@@ -131,16 +131,14 @@ function AdminView({ dao, userTokenAccount }: { dao: any, userTokenAccount: any 
                 subtitle="Authority-only administrative controls."
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {!dao && (
-                    <PremiumCard className="p-10 border-slate-800/50 space-y-6">
-                        <h3 className="text-sm font-black text-slate-100 uppercase tracking-widest">Bootstrap Network</h3>
-                        <p className="text-xs text-slate-500">Initialize the core DAO and Treasury accounts on this cluster.</p>
-                        <div className="space-y-4">
-                            <InitializeDao />
-                            <InitializeTreasury />
-                        </div>
-                    </PremiumCard>
-                )}
+                <PremiumCard className="p-10 border-slate-800/50 space-y-6">
+                    <h3 className="text-sm font-black text-slate-100 uppercase tracking-widest">Bootstrap Network</h3>
+                    <p className="text-xs text-slate-500">Initialize the core DAO and Treasury accounts on this cluster.</p>
+                    <div className="space-y-4">
+                        <InitializeDao />
+                        <InitializeTreasury />
+                    </div>
+                </PremiumCard>
                 <PremiumCard className="p-10 border-slate-800/50">
                     <WithdrawTokens destinationTokenAccount={userTokenAccount} />
                 </PremiumCard>
@@ -220,7 +218,7 @@ function AppContent() {
                                     <Route path="/create" element={<CreateProposalView nextId={nextId} />} />
                                     <Route path="/treasury" element={<TreasuryView userTokenAccount={userTokenAccount} />} />
                                     <Route path="/profile" element={<ProfileView />} />
-                                    <Route path="/admin" element={<AdminView dao={dao} userTokenAccount={userTokenAccount} />} />
+                                    <Route path="/admin" element={<AdminView userTokenAccount={userTokenAccount} />} />
                                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                                 </Routes>
                             </motion.div>

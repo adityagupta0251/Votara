@@ -3,6 +3,7 @@ import { BN } from "@coral-xyz/anchor";
 import { useProgram } from "../program";
 import { useWallet } from "../wallet";
 import { useTransaction } from "../hooks/useTransaction";
+import { useVoter } from "../hooks/useVoter";
 import { pdaDao, pdaProposal, pdaAnalytics, pdaTreasury, pdaVoter, pdaConfig } from "../pda";
 import { SystemProgram } from "@solana/web3.js";
 import { type ProposalTypeLabel } from "../types";
@@ -18,6 +19,7 @@ export function CreateProposal({ nextProposalId }: { nextProposalId: number }) {
     const { program } = useProgram();
     const { publicKey } = useWallet();
     const { execute, txState } = useTransaction();
+    const { exists: voterExists } = useVoter();
 
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
@@ -29,6 +31,10 @@ export function CreateProposal({ nextProposalId }: { nextProposalId: number }) {
 
     const create = async () => {
         if (!program || !publicKey) return;
+
+        if (!voterExists) {
+            throw new Error("You must register as a voter before creating a proposal.");
+        }
 
         const proposalId = new BN(nextProposalId);
         const [daoPda] = pdaDao();
@@ -165,10 +171,10 @@ export function CreateProposal({ nextProposalId }: { nextProposalId: number }) {
 
             <button 
                 onClick={create}
-                disabled={busy || !title || !desc}
+                disabled={busy || !title || !desc || !voterExists}
                 className="w-full premium-btn btn-slate py-4 font-black uppercase tracking-widest text-[10px]"
             >
-                {busy ? "Submitting to Ledger..." : "Broadcast Proposal"}
+                {busy ? "Submitting to Ledger..." : !voterExists ? "Register to Propose" : "Broadcast Proposal"}
             </button>
 
             {txState.error && (

@@ -35,8 +35,9 @@ export function RegisterVoter() {
             try {
                 treasury = await (program.account as any).treasury.fetch(treasuryPda);
             } catch (err) {
+                console.error("Treasury fetch error:", err);
                 throw new Error(
-                    "Treasury not initialized. Please run 'Initialize Treasury' first."
+                    "DAO Treasury is not yet initialized. Please contact an administrator."
                 );
             }
             const realMint = treasury.governanceTokenMint;
