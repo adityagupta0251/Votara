@@ -1,4 +1,4 @@
-import { useTreasury } from "../hooks/useTresury";
+import { useTreasury } from "../hooks/useTreasury";
 import { formatSol, formatTokens } from "../utils";
 
 export function TreasuryInfo() {

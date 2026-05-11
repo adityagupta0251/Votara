@@ -17,8 +17,8 @@ export function useDao() {
         try {
             const [daoPda] = pdaDao();
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const acc = await (program.account as any).dao.fetch(daoPda);
-            setDao(acc as DaoAccount);
+            const acc = await (program.account as any).dao.fetchNullable(daoPda);
+            setDao(acc as DaoAccount | null);
         } catch (e) {
             setError((e as Error).message ?? "Failed to fetch DAO");
         } finally {
@@ -46,8 +46,8 @@ export function useDao() {
             try {
                 const [daoPda] = pdaDao();
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const acc = await (program.account as any).dao.fetch(daoPda);
-                if (isMounted) setDao(acc as DaoAccount);
+                const acc = await (program.account as any).dao.fetchNullable(daoPda);
+                if (isMounted) setDao(acc as DaoAccount | null);
             } catch (e) {
                 if (isMounted)
                     setError((e as Error).message ?? "Failed to fetch DAO");

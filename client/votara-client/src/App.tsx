@@ -157,7 +157,8 @@ function AppContent() {
     const location = useLocation();
 
     const nextId = dao ? dao.totalProposals.toNumber() : 0;
-    const isAdmin = !!(dao && publicKey && dao.authority.equals(publicKey));
+    // Allow admin access if DAO exists and user is authority, OR if DAO doesn't exist (to allow bootstrap)
+    const isAdmin = dao ? (!!publicKey && dao.authority.equals(publicKey)) : true;
 
     if (isAppLoading) {
         return <SplashScreen onFinish={() => setIsAppLoading(false)} />;

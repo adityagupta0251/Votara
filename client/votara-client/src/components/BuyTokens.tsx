@@ -4,7 +4,7 @@ import { useProgram } from "../program";
 import { useWallet } from "../wallet";
 import { useTransaction } from "../hooks/useTransaction";
 import { useVoter } from "../hooks/useVoter";
-import { useTreasury } from "../hooks/useTresury";
+import { useTreasury } from "../hooks/useTreasury";
 import { pdaDao, pdaTreasury, pdaVault, pdaGovMint, pdaVoter } from "../pda";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { SystemProgram } from "@solana/web3.js";
