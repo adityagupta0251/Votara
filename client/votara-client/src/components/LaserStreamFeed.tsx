@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useConnection } from "../connection";
+import { useConnection } from "../wallet";
 import { useProgram } from "../program";
 import { shortenKey } from "../utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,7 +14,7 @@ interface LiveEvent {
 }
 
 export function LaserStreamFeed() {
-    const connection = useConnection();
+    const { connection } = useConnection();
     const { program } = useProgram();
     const [events, setEvents] = useState<LiveEvent[]>([]);
 
@@ -25,7 +25,7 @@ export function LaserStreamFeed() {
             program.programId,
             (logs) => {
                 if (logs.err) return;
-                
+
                 const newEvent: LiveEvent = {
                     id: Math.random().toString(36).substring(7),
                     type: "VOTE",
@@ -77,7 +77,7 @@ export function LaserStreamFeed() {
                         </div>
                     ) : (
                         events.map((event) => (
-                            <motion.div 
+                            <motion.div
                                 key={event.id}
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -109,11 +109,11 @@ export function LaserStreamFeed() {
                 </div>
                 <div className="flex gap-0.5">
                     {[1, 2, 3, 4].map(i => (
-                        <motion.div 
-                            key={i} 
+                        <motion.div
+                            key={i}
                             animate={{ height: [8, 16, 8] }}
                             transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-                            className="w-1 bg-slate-700 rounded-full" 
+                            className="w-1 bg-slate-700 rounded-full"
                         />
                     ))}
                 </div>

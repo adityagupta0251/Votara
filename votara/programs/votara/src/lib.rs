@@ -10,7 +10,7 @@ pub use errors::*;
 pub use events::*;
 pub use state::*;
 
-declare_id!("8A1F7cmMYi5L8cC2Zs3Uzu8RH3MSQGRbSGCx8AsD8RxZ");
+declare_id!("CXJXjwHGo67zYveByRp2aydFgXHRcPTEQbRt8iNQEtvF");
 
 #[program]
 pub mod votara {

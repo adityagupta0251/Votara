@@ -1,5 +1,8 @@
 import { Buffer } from "buffer";
+import process from "process";
+import "./polyfills";
 globalThis.Buffer = Buffer;
+globalThis.process = process;
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

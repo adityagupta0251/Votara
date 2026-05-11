@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-    ChevronLeft, 
+import {
+    ChevronLeft,
     ExternalLink
 } from "lucide-react";
 import {
@@ -86,7 +86,7 @@ function CreateProposalView({ nextId }: { nextId: number }) {
                 subtitle="Submit a change request to the Votara network."
             />
             <PremiumCard className="p-10">
-                 <CreateProposal nextProposalId={nextId} />
+                <CreateProposal nextProposalId={nextId} />
             </PremiumCard>
         </div>
     );
@@ -154,6 +154,7 @@ function AppContent() {
     const { dao } = useDao();
     const [isAppLoading, setIsAppLoading] = useState(true);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [selectedProposal, setSelectedProposal] = useState<ProposalWithPubkey | null>(null);
     const userTokenAccount = useTokenAccount();
     const location = useLocation();
 
@@ -165,7 +166,7 @@ function AppContent() {
     }
 
     // To maintain existing behavior of ProposalInfo without rewriting its data fetching
-    const [selectedProposal, setSelectedProposal] = useState<ProposalWithPubkey | null>(null);
+
 
     return (
         <div className="min-h-screen flex bg-bg-deep text-slate-400 selection:bg-slate-700/50">

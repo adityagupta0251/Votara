@@ -77,7 +77,7 @@ export function InitializeTreasury() {
                     authority: publicKey,
                     dao: daoPda,
                     treasury: treasuryPda,
-                    governanceTokenMint: mintPda,
+                    
                     vault: vaultPda,
                     tokenProgram: TOKEN_PROGRAM_ID,
                     systemProgram: SystemProgram.programId,
