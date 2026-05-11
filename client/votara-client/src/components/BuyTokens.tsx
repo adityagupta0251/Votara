@@ -3,7 +3,9 @@ import { BN } from "@coral-xyz/anchor";
 import { useProgram } from "../program";
 import { useWallet } from "../wallet";
 import { useTransaction } from "../hooks/useTransaction";
-import { pdaDao, pdaTreasury, pdaVault } from "../pda";
+import { useVoter } from "../hooks/useVoter";
+import { useTreasury } from "../hooks/useTresury";
+import { pdaDao, pdaTreasury, pdaVault, pdaGovMint, pdaVoter } from "../pda";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { SystemProgram } from "@solana/web3.js";
 import type { PublicKey } from "@solana/web3.js";
@@ -12,14 +14,27 @@ export function BuyTokens({ buyerTokenAccount }: { buyerTokenAccount: PublicKey 
     const { program } = useProgram();
     const { publicKey } = useWallet();
     const { execute, txState } = useTransaction();
+    const { exists: voterExists } = useVoter();
+    const { treasury } = useTreasury();
 
     const [amount, setAmount] = useState("1");
 
     const buy = async () => {
         if (!program || !publicKey || !buyerTokenAccount) return;
+
+        if (!treasury) {
+            throw new Error("DAO Treasury is not initialized.");
+        }
+
+        if (!voterExists) {
+            throw new Error("You must register as a voter before purchasing tokens.");
+        }
+
         const [daoPda] = pdaDao();
         const [treasuryPda] = pdaTreasury();
         const [vaultPda] = pdaVault();
+        const [mintPda] = pdaGovMint();
+        const [voterPda] = pdaVoter(publicKey);
 
         await execute(async () => {
             return (program.methods as any)
@@ -28,6 +43,8 @@ export function BuyTokens({ buyerTokenAccount }: { buyerTokenAccount: PublicKey 
                     buyer: publicKey,
                     dao: daoPda,
                     treasury: treasuryPda,
+                    voter: voterPda,
+                    governanceTokenMint: mintPda,
                     vault: vaultPda,
                     buyerTokenAccount: buyerTokenAccount,
                     tokenProgram: TOKEN_PROGRAM_ID,
@@ -55,10 +72,10 @@ export function BuyTokens({ buyerTokenAccount }: { buyerTokenAccount: PublicKey 
 
                 <button 
                     onClick={buy}
-                    disabled={busy || !buyerTokenAccount}
+                    disabled={busy || !buyerTokenAccount || !treasury || !voterExists}
                     className="w-full premium-btn btn-slate py-4 font-black uppercase tracking-widest text-[10px]"
                 >
-                    {busy ? "Broadcasting..." : "Swap SOL for VTR"}
+                    {busy ? "Broadcasting..." : !treasury ? "Treasury Locked" : !voterExists ? "Register to Buy" : "Swap SOL for VTR"}
                 </button>
             </div>
 
